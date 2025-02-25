@@ -21,6 +21,7 @@ func main() {
 	if err != nil {
 		lgr.Err.Fatalf("Ошибка запуска бота\n%v", err)
 	}
+	lgr.Info.Printf("Бот запущен с именем @%s", bot.Me.Username)
 
 	bot.Handle("/start", func(c tele.Context) error {
 		return c.Send("Base implementation")
