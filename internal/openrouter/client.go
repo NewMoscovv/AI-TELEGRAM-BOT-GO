@@ -1,6 +1,7 @@
 package openrouter
 
 import (
+	"DeepSee_MAI/pkg/consts"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -68,21 +69,31 @@ func (c *Client) GetResponse(prompt string) (string, error) {
 
 	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("ошибка при чтении ответа: %v", err)
+		return "", fmt.Errorf("%s: %v", consts.ResponseBodyError, err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("ошибка API: %s\nТело ответа: %s", resp.Status, string(responseBody))
+		return "", fmt.Errorf(
+			"%s: %s\nТело ответа: %s",
+			consts.ApiRouterError,
+			resp.Status,
+			string(responseBody))
 	}
 
+	// Парсим JSON
 	var response ResponseBody
 	if err := json.Unmarshal(responseBody, &response); err != nil {
-		return "", fmt.Errorf("ошибка при парсинге JSON: %v\nТело ответа: %s", err, string(responseBody))
+		return "", fmt.Errorf("%s: %v\nТело ответа: %s",
+			consts.JSONParsingError,
+			err,
+			string(responseBody))
 	}
 
+	// Проверяем, что ответ содержит choices
 	if len(response.Choices) == 0 {
-		return "", fmt.Errorf("нет ответа от ИИ")
+		return "", fmt.Errorf("%s", consts.EmptyAnswerByAIError)
 	}
 
+	// Возвращаем ответ
 	return response.Choices[0].Message.Content, nil
 }

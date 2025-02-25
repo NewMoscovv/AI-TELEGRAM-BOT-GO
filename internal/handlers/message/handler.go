@@ -3,9 +3,11 @@ package message
 import (
 	"DeepSee_MAI/internal/config"
 	"DeepSee_MAI/internal/openrouter"
+	"DeepSee_MAI/pkg/consts"
 	"DeepSee_MAI/pkg/logger"
 	tele "gopkg.in/telebot.v3"
 	"strings"
+	"time"
 )
 
 type MsgHandler interface {
@@ -46,9 +48,12 @@ func (h *Handler) HandleStart(c tele.Context) error {
 func (h *Handler) HandleText(c tele.Context) error {
 	h.lgr.Info.Printf("%s | %s", c.Sender().Username, c.Text())
 
-	for {
+	for i := 0; i < consts.MaxAmountResponses; i++ {
 		// Печатает...
-		c.Notify(tele.Typing)
+		err := c.Notify(tele.Typing)
+		if err != nil {
+			h.lgr.Err.Printf("%s\n%s", consts.TypingAnimationError, err.Error())
+		}
 
 		response, err := h.OpnRtr.GetResponse(c.Text())
 		if err != nil {
@@ -61,5 +66,9 @@ func (h *Handler) HandleText(c tele.Context) error {
 			h.lgr.Info.Printf("%s | \"%s\"", h.Bot.Me.Username, strings.Replace(response, "\n\n", "\n", -1))
 			return c.Send(response)
 		}
+		time.Sleep(1 * time.Second)
 	}
+
+	return c.Send("Произошла ошибка при получении ответа от ИИ. Пожалуйста, повторите запрос или обратитесь в поддержку")
+
 }
