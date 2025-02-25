@@ -10,7 +10,7 @@ type Config struct {
 	TelegramToken string
 }
 
-func NewConfig() (*Config, error) {
+func InitConfig() (*Config, error) {
 
 	err := godotenv.Load(".env")
 	if err != nil {
