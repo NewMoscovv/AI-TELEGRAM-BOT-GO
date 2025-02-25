@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 	"os"
@@ -29,12 +28,6 @@ func InitConfig() (*Config, error) {
 	if err := viper.Unmarshal(&config); err != nil {
 		return nil, err
 	}
-
-	//if err := viper.UnmarshalKey("prompt", &config.TemporaryPath); err != nil {
-	//	return nil, err
-	//}
-
-	fmt.Println(config.Prompt)
 
 	err := parseEnv(&config)
 	if err != nil {

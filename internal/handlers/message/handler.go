@@ -24,7 +24,7 @@ type Handler struct {
 func NewHandler(bot *tele.Bot, logger *logger.Logger, cfg *config.Config) *Handler {
 	return &Handler{
 		Bot:    bot,
-		OpnRtr: openrouter.NewClient(cfg.OpnRtrToken, cfg.APIUrl, cfg.Model),
+		OpnRtr: openrouter.NewClient(cfg.OpnRtrToken, cfg.APIUrl, cfg.Model, cfg.Prompt),
 		lgr:    logger,
 	}
 }
@@ -42,7 +42,9 @@ func SetupHandlers(bot *tele.Bot, logger *logger.Logger, cfg *config.Config) {
 func (h *Handler) HandleStart(c tele.Context) error {
 	h.lgr.Info.Printf("%s | %s", c.Sender().Username, c.Text())
 
-	return c.Send("Привет!")
+	return c.Send("<b>Привет!</b>", &tele.SendOptions{
+		ParseMode: tele.ModeHTML,
+	})
 }
 
 func (h *Handler) HandleText(c tele.Context) error {

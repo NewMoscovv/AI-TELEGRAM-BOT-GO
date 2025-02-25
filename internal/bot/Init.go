@@ -12,7 +12,7 @@ func InitBot(cfg *config.Config) (*tele.Bot, error) {
 	pref := tele.Settings{
 		Token:     cfg.TelegramToken,
 		Poller:    &tele.LongPoller{Timeout: 10 * time.Second},
-		ParseMode: tele.ModeHTML,
+		ParseMode: tele.ModeMarkdown,
 	}
 
 	// создание экземлпяра бота

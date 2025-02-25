@@ -33,16 +33,25 @@ type Client struct {
 	APIKey string
 	APIUrl string
 	Model  string
+	Prompt string
 }
 
-func NewClient(APIKey, APIUrl, Model string) *Client {
-	return &Client{APIKey: APIKey, APIUrl: APIUrl, Model: Model}
+func NewClient(APIKey, APIUrl, Model string, prompt string) *Client {
+	return &Client{
+		APIKey: APIKey,
+		APIUrl: APIUrl,
+		Model:  Model,
+		Prompt: prompt}
 }
 
 func (c *Client) GetResponse(prompt string) (string, error) {
 	requestBody := RequestBody{
 		Model: c.Model,
 		Messages: []Message{
+			{
+				Role:    "system",
+				Content: c.Prompt,
+			},
 			{
 				Role:    "user",
 				Content: prompt,
