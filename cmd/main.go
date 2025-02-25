@@ -1,10 +1,10 @@
 package main
 
 import (
-	"DeepSee_MAI/config"
+	b "DeepSee_MAI/internal/bot"
+	"DeepSee_MAI/internal/config"
 	"DeepSee_MAI/pkg/logger"
 	tele "gopkg.in/telebot.v3"
-	"time"
 )
 
 func main() {
@@ -13,20 +13,13 @@ func main() {
 
 	cfg, err := config.InitConfig()
 	if err != nil {
-		lgr.Err.Fatalf("Ошибка при инициализации конфигурации\n%v", err)
+		lgr.Err.Fatalf("Ошибка инициализации конфигурации\n%v", err)
 	}
 
-	// настройка характеристик бота
-	pref := tele.Settings{
-		Token:     cfg.TelegramToken,
-		Poller:    &tele.LongPoller{Timeout: 10 * time.Second},
-		ParseMode: tele.ModeHTML,
-	}
-
-	// создание экземлпяра бота
-	bot, err := tele.NewBot(pref)
+	// инициализация бота
+	bot, err := b.InitBot(cfg)
 	if err != nil {
-		lgr.Err.Fatalf("Ошибка при запуске бота\n%v", err)
+		lgr.Err.Fatalf("Ошибка запуска бота\n%v", err)
 	}
 
 	bot.Handle("/start", func(c tele.Context) error {
