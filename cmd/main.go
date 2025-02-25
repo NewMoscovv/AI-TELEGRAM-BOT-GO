@@ -24,7 +24,7 @@ func main() {
 
 	lgr.Info.Printf("Бот запущен с именем @%s", bot.Me.Username)
 
-	message.SetupHandlers(bot, lgr)
+	message.SetupHandlers(bot, lgr, cfg)
 
 	bot.Start()
 }

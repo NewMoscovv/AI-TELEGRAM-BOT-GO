@@ -1,6 +1,8 @@
 package message
 
 import (
+	"DeepSee_MAI/internal/config"
+	"DeepSee_MAI/internal/openrouter"
 	"DeepSee_MAI/pkg/logger"
 	tele "gopkg.in/telebot.v3"
 )
@@ -11,21 +13,23 @@ type MsgHandler interface {
 }
 
 type Handler struct {
-	Bot *tele.Bot
-	lgr *logger.Logger
+	Bot    *tele.Bot
+	OpnRtr openrouter.ClientResponse
+	lgr    *logger.Logger
 }
 
-func NewHandler(bot *tele.Bot, logger *logger.Logger) *Handler {
+func NewHandler(bot *tele.Bot, logger *logger.Logger, cfg *config.Config) *Handler {
 	return &Handler{
-		Bot: bot,
-		lgr: logger,
+		Bot:    bot,
+		OpnRtr: openrouter.NewClient(cfg.OpnRtrToken, cfg.APIUrl, cfg.Model),
+		lgr:    logger,
 	}
 }
 
-func SetupHandlers(bot *tele.Bot, logger *logger.Logger) {
+func SetupHandlers(bot *tele.Bot, logger *logger.Logger, cfg *config.Config) {
 	var msgHandler MsgHandler
 
-	msgHandler = NewHandler(bot, logger)
+	msgHandler = NewHandler(bot, logger, cfg)
 
 	bot.Handle("/start", msgHandler.HandleStart)
 	bot.Handle(tele.OnText, msgHandler.HandleText)
