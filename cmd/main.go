@@ -3,8 +3,8 @@ package main
 import (
 	b "DeepSee_MAI/internal/bot"
 	"DeepSee_MAI/internal/config"
+	"DeepSee_MAI/internal/handlers/message"
 	"DeepSee_MAI/pkg/logger"
-	tele "gopkg.in/telebot.v3"
 )
 
 func main() {
@@ -21,11 +21,10 @@ func main() {
 	if err != nil {
 		lgr.Err.Fatalf("Ошибка запуска бота\n%v", err)
 	}
+
 	lgr.Info.Printf("Бот запущен с именем @%s", bot.Me.Username)
 
-	bot.Handle("/start", func(c tele.Context) error {
-		return c.Send("Base implementation")
-	})
+	message.SetupHandlers(bot, lgr)
 
 	bot.Start()
 }

@@ -1,6 +1,7 @@
 package message
 
 import (
+	"DeepSee_MAI/pkg/logger"
 	tele "gopkg.in/telebot.v3"
 )
 
@@ -11,16 +12,24 @@ type MsgHandler interface {
 
 type Handler struct {
 	Bot *tele.Bot
+	lgr *logger.Logger
 }
 
-func NewHandler(bot *tele.Bot) *Handler {
+func NewHandler(bot *tele.Bot, logger *logger.Logger) *Handler {
 	return &Handler{
 		Bot: bot,
+		lgr: logger,
 	}
 }
 
-func SetupHandlers(bot *tele.Bot) {
-	// Todo: implement me
+func SetupHandlers(bot *tele.Bot, logger *logger.Logger) {
+	var msgHandler MsgHandler
+
+	msgHandler = NewHandler(bot, logger)
+
+	bot.Handle("/start", msgHandler.HandleStart)
+	bot.Handle(tele.OnText, msgHandler.HandleText)
+
 }
 
 func (h *Handler) HandleStart(c tele.Context) error {
