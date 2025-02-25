@@ -5,7 +5,6 @@ import (
 	"os"
 )
 
-// Config хранит данные конфигурации
 type Config struct {
 	TelegramToken string
 }
