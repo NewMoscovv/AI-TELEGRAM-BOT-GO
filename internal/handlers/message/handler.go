@@ -33,9 +33,13 @@ func SetupHandlers(bot *tele.Bot, logger *logger.Logger) {
 }
 
 func (h *Handler) HandleStart(c tele.Context) error {
+	h.lgr.Info.Printf("%s | %s", c.Sender().Username, c.Text())
+
 	return c.Send("Привет!")
 }
 
 func (h *Handler) HandleText(c tele.Context) error {
+	h.lgr.Info.Printf("%s | %s", c.Sender().Username, c.Text())
+
 	return c.Send("Привет?")
 }
