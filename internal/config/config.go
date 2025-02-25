@@ -2,7 +2,9 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 	"os"
 )
 
@@ -11,40 +13,69 @@ type Config struct {
 	OpnRtrToken   string
 	APIUrl        string
 	Model         string
+
+	Prompt string `mapstructure:"prompt"`
 }
 
 func InitConfig() (*Config, error) {
+	viper.AddConfigPath("./")
+	viper.SetConfigName("main")
 
-	err := godotenv.Load(".env")
+	if err := viper.ReadInConfig(); err != nil {
+		return nil, err
+	}
+
+	var config Config
+	if err := viper.Unmarshal(&config); err != nil {
+		return nil, err
+	}
+
+	//if err := viper.UnmarshalKey("prompt", &config.TemporaryPath); err != nil {
+	//	return nil, err
+	//}
+
+	fmt.Println(config.Prompt)
+
+	err := parseEnv(&config)
 	if err != nil {
 		return nil, err
 	}
 
+	return &config, nil
+
+}
+
+func parseEnv(cfg *Config) error {
+	err := godotenv.Load(".env")
+	if err != nil {
+		return err
+	}
+
 	telegramToken := os.Getenv("TELEGRAM_TOKEN")
 	if telegramToken == "" {
-		return nil, errors.New("отсутствует TELEGRAM_TOKEN")
+		return errors.New("отсутствует TELEGRAM_TOKEN")
 	}
 
 	openRouterToken := os.Getenv("OPENROUTER_TOKEN")
 	if openRouterToken == "" {
-		return nil, errors.New("отсутствует токен OpenRouter")
+		return errors.New("отсутствует токен OpenRouter")
 	}
 
 	apiUrl := os.Getenv("API_URL")
 	if apiUrl == "" {
-		return nil, errors.New("отсутствует API_URL")
+		return errors.New("отсутствует API_URL")
 	}
 
 	model := os.Getenv("MODEL")
 	if model == "" {
-		return nil, errors.New("отсутствует название Модели")
+		return errors.New("отсутствует название Модели")
 	}
 
-	return &Config{
-		TelegramToken: telegramToken,
-		OpnRtrToken:   openRouterToken,
-		APIUrl:        apiUrl,
-		Model:         model,
-	}, nil
+	cfg.TelegramToken = telegramToken
+	cfg.OpnRtrToken = openRouterToken
+	cfg.APIUrl = apiUrl
+	cfg.Model = model
+
+	return nil
 
 }
