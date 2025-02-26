@@ -41,10 +41,12 @@ func SetupHandlers(bot *tele.Bot, logger *logger.Logger, cfg *config.Config) {
 
 func (h *Handler) HandleStart(c tele.Context) error {
 	h.lgr.Info.Printf("%s | %s", c.Sender().Username, c.Text())
+	h.lgr.Info.Printf("%s | %s", h.Bot.Me.Username, c.Text())
 
-	return c.Send("<b>Привет!</b>", &tele.SendOptions{
-		ParseMode: tele.ModeHTML,
-	})
+	return c.Send("<b>Привет!</b>",
+		&tele.SendOptions{
+			ParseMode: tele.ModeHTML,
+		})
 }
 
 func (h *Handler) HandleText(c tele.Context) error {
