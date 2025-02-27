@@ -10,7 +10,7 @@ const (
 	TypingAnimationError = "ошибка анимации TYPING"
 )
 
-// ошибки openrouter
+// ошибки open_router
 const (
 	ResponseBodyError    = "ошибка при чтении ответа"
 	ApiRouterError       = "ошибка API"

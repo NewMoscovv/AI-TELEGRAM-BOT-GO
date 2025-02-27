@@ -2,11 +2,26 @@ package bot
 
 import (
 	"DeepSee_MAI/internal/config"
+	"DeepSee_MAI/internal/handlers/message"
+	"DeepSee_MAI/internal/openrouter"
+	"DeepSee_MAI/pkg/logger"
 	tele "gopkg.in/telebot.v3"
 	"time"
 )
 
-func InitBot(cfg *config.Config) (*tele.Bot, error) {
+type App struct {
+	Bot            *tele.Bot
+	OpnRtr         *openrouter.Client
+	msgHandler     message.MsgHandler
+	Lgr            *logger.Logger
+	SystemMessages SystemMessages
+}
+
+type SystemMessages struct {
+	Messages config.Messages
+}
+
+func InitApp(cfg *config.Config, lgr *logger.Logger) (*App, error) {
 
 	// настройка характеристик бота
 	pref := tele.Settings{
@@ -21,5 +36,40 @@ func InitBot(cfg *config.Config) (*tele.Bot, error) {
 		return nil, err
 	}
 
-	return bot, nil
+	// подключение к openRouter
+	opnRtr := openrouter.NewClient(cfg.OpnRtrToken, cfg.APIUrl, cfg.Model, cfg.Prompt)
+
+	return &App{
+		Bot:            bot,
+		OpnRtr:         opnRtr,
+		Lgr:            lgr,
+		SystemMessages: SystemMessages{cfg.Messages},
+	}, nil
+}
+
+func (app *App) Start() {
+
+	app.Lgr.Info.Printf("Бот запущен с именем @%s", app.Bot.Me.Username)
+
+	app.setupHandlers()
+
+	app.Bot.Start()
+}
+
+func (app *App) setupHandlers() {
+
+	app.msgHandler = app.newHandler()
+
+	app.Bot.Handle("/start", app.msgHandler.HandleStart)
+	app.Bot.Handle(tele.OnText, app.msgHandler.HandleText)
+
+}
+
+func (app *App) newHandler() *message.Handler {
+	return &message.Handler{
+		Bot:      app.Bot,
+		OpnRtr:   app.OpnRtr,
+		Messages: app.SystemMessages.Messages,
+		Lgr:      app.Lgr,
+	}
 }

@@ -3,7 +3,6 @@ package main
 import (
 	b "DeepSee_MAI/internal/bot"
 	"DeepSee_MAI/internal/config"
-	"DeepSee_MAI/internal/handlers/message"
 	"DeepSee_MAI/pkg/consts"
 	"DeepSee_MAI/pkg/logger"
 )
@@ -18,14 +17,11 @@ func main() {
 	}
 
 	// инициализация бота
-	bot, err := b.InitBot(cfg)
+	app, err := b.InitApp(cfg, lgr)
 	if err != nil {
 		lgr.Err.Fatalf("%s\n%v", consts.BotStartPollingError, err)
 	}
 
-	lgr.Info.Printf("Бот запущен с именем @%s", bot.Me.Username)
+	app.Start()
 
-	message.SetupHandlers(bot, lgr, cfg)
-
-	bot.Start()
 }

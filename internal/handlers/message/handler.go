@@ -16,58 +16,41 @@ type MsgHandler interface {
 }
 
 type Handler struct {
-	Bot    *tele.Bot
-	OpnRtr openrouter.ClientResponse
-	lgr    *logger.Logger
-}
-
-func NewHandler(bot *tele.Bot, logger *logger.Logger, cfg *config.Config) *Handler {
-	return &Handler{
-		Bot:    bot,
-		OpnRtr: openrouter.NewClient(cfg.OpnRtrToken, cfg.APIUrl, cfg.Model, cfg.Prompt),
-		lgr:    logger,
-	}
-}
-
-func SetupHandlers(bot *tele.Bot, logger *logger.Logger, cfg *config.Config) {
-	var msgHandler MsgHandler
-
-	msgHandler = NewHandler(bot, logger, cfg)
-
-	bot.Handle("/start", msgHandler.HandleStart)
-	bot.Handle(tele.OnText, msgHandler.HandleText)
-
+	Bot      *tele.Bot
+	OpnRtr   *openrouter.Client
+	Lgr      *logger.Logger
+	Messages config.Messages
 }
 
 func (h *Handler) HandleStart(c tele.Context) error {
-	h.lgr.Info.Printf("%s | %s", c.Sender().Username, c.Text())
-	h.lgr.Info.Printf("%s | %s", h.Bot.Me.Username, c.Text())
+	h.Lgr.Info.Printf("%s | %s", c.Sender().Username, c.Text())
+	h.Lgr.Info.Printf("%s | %s", h.Bot.Me.Username, c.Text())
 
-	return c.Send("<b>Привет!</b>",
+	return c.Send(h.Messages.Errors.SmthGoneWrong,
 		&tele.SendOptions{
 			ParseMode: tele.ModeHTML,
 		})
 }
 
 func (h *Handler) HandleText(c tele.Context) error {
-	h.lgr.Info.Printf("%s | %s", c.Sender().Username, c.Text())
+	h.Lgr.Info.Printf("%s | %s", c.Sender().Username, c.Text())
 
 	for i := 0; i < consts.MaxAmountResponses; i++ {
 		// Печатает...
 		err := c.Notify(tele.Typing)
 		if err != nil {
-			h.lgr.Err.Printf("%s\n%s", consts.TypingAnimationError, err.Error())
+			h.Lgr.Err.Printf("%s\n%s", consts.TypingAnimationError, err.Error())
 		}
 
 		response, err := h.OpnRtr.GetResponse(c.Text())
 		if err != nil {
-			h.lgr.Err.Printf("%s", err.Error())
-			return c.Send("Ой, что-то пошло не так. Обратитесь в поддержку - <b>@new_moscovv</b>")
+			h.Lgr.Err.Printf("%s", err.Error())
+			return c.Send(h.Messages.Errors.SmthGoneWrong)
 		}
 		if response == "" {
-			h.lgr.Err.Printf("пустой ответ от ИИ, выполнение повторного запроса...")
+			h.Lgr.Err.Printf("пустой ответ от ИИ, выполнение повторного запроса...")
 		} else {
-			h.lgr.Info.Printf("%s | \"%s\"", h.Bot.Me.Username, strings.Replace(response, "\n\n", "\n", -1))
+			h.Lgr.Info.Printf("%s | \"%s\"", h.Bot.Me.Username, strings.Replace(response, "\n\n", "\n", -1))
 			return c.Send(response)
 		}
 		time.Sleep(1 * time.Second)

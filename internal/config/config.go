@@ -13,7 +13,16 @@ type Config struct {
 	APIUrl        string
 	Model         string
 
-	Prompt string `mapstructure:"prompt"`
+	Prompt   string `mapstructure:"prompt"`
+	Messages Messages
+}
+
+type Messages struct {
+	Errors Errors
+}
+
+type Errors struct {
+	SmthGoneWrong string `mapstructure:"smth_gone_wrong"`
 }
 
 func InitConfig() (*Config, error) {
@@ -26,6 +35,10 @@ func InitConfig() (*Config, error) {
 
 	var config Config
 	if err := viper.Unmarshal(&config); err != nil {
+		return nil, err
+	}
+
+	if err := viper.UnmarshalKey("messages.errors", &config.Messages.Errors); err != nil {
 		return nil, err
 	}
 
