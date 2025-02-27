@@ -17,3 +17,11 @@ const (
 	JSONParsingError     = "ошибка при парсинге JSON"
 	EmptyAnswerByAIError = "нет ответа от ИИ"
 )
+
+// ошибки при сборке конфигурации
+const (
+	NoTelegramToken   = "отсутствует TELEGRAM_TOKEN"
+	NoOpenRouterToken = "отсутствует токен OpenRouter"
+	NoUrl             = "отсутствует API_URL"
+	Model             = "отсутствует название Модели"
+)

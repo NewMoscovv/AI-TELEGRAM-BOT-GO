@@ -1,6 +1,7 @@
 package config
 
 import (
+	"DeepSee_MAI/pkg/consts"
 	"errors"
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
@@ -59,22 +60,22 @@ func parseEnv(cfg *Config) error {
 
 	telegramToken := os.Getenv("TELEGRAM_TOKEN")
 	if telegramToken == "" {
-		return errors.New("отсутствует TELEGRAM_TOKEN")
+		return errors.New(consts.NoTelegramToken)
 	}
 
 	openRouterToken := os.Getenv("OPENROUTER_TOKEN")
 	if openRouterToken == "" {
-		return errors.New("отсутствует токен OpenRouter")
+		return errors.New(consts.NoOpenRouterToken)
 	}
 
 	apiUrl := os.Getenv("API_URL")
 	if apiUrl == "" {
-		return errors.New("отсутствует API_URL")
+		return errors.New(consts.NoUrl)
 	}
 
 	model := os.Getenv("MODEL")
 	if model == "" {
-		return errors.New("отсутствует название Модели")
+		return errors.New(consts.Model)
 	}
 
 	cfg.TelegramToken = telegramToken
