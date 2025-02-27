@@ -16,17 +16,17 @@ type MsgHandler interface {
 }
 
 type Handler struct {
-	Bot      *tele.Bot
-	OpnRtr   *openrouter.Client
-	Lgr      *logger.Logger
-	Messages config.Messages
+	Bot         *tele.Bot
+	OpnRtr      *openrouter.Client
+	Lgr         *logger.Logger
+	BotMessages config.BotMessages
 }
 
 func (h *Handler) HandleStart(c tele.Context) error {
 	h.Lgr.Info.Printf("%s | %s", c.Sender().Username, c.Text())
 	h.Lgr.Info.Printf("%s | %s", h.Bot.Me.Username, c.Text())
 
-	return c.Send(h.Messages.Errors.SmthGoneWrong,
+	return c.Send("Привет <b>Я ИИ</b>",
 		&tele.SendOptions{
 			ParseMode: tele.ModeHTML,
 		})
@@ -45,7 +45,7 @@ func (h *Handler) HandleText(c tele.Context) error {
 		response, err := h.OpnRtr.GetResponse(c.Text())
 		if err != nil {
 			h.Lgr.Err.Printf("%s", err.Error())
-			return c.Send(h.Messages.Errors.SmthGoneWrong)
+			return c.Send(h.BotMessages.Errors.SmthGoneWrong)
 		}
 		if response == "" {
 			h.Lgr.Err.Printf("пустой ответ от ИИ, выполнение повторного запроса...")

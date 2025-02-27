@@ -14,11 +14,11 @@ type Config struct {
 	APIUrl        string
 	Model         string
 
-	Prompt   string `mapstructure:"prompt"`
-	Messages Messages
+	Prompt      string `mapstructure:"prompt"`
+	BotMessages BotMessages
 }
 
-type Messages struct {
+type BotMessages struct {
 	Errors Errors
 }
 
@@ -39,7 +39,7 @@ func InitConfig() (*Config, error) {
 		return nil, err
 	}
 
-	if err := viper.UnmarshalKey("messages.errors", &config.Messages.Errors); err != nil {
+	if err := viper.UnmarshalKey("messages.errors", &config.BotMessages.Errors); err != nil {
 		return nil, err
 	}
 

@@ -18,7 +18,7 @@ type App struct {
 }
 
 type SystemMessages struct {
-	Messages config.Messages
+	BotMessages config.BotMessages
 }
 
 func InitApp(cfg *config.Config, lgr *logger.Logger) (*App, error) {
@@ -43,7 +43,7 @@ func InitApp(cfg *config.Config, lgr *logger.Logger) (*App, error) {
 		Bot:            bot,
 		OpnRtr:         opnRtr,
 		Lgr:            lgr,
-		SystemMessages: SystemMessages{cfg.Messages},
+		SystemMessages: SystemMessages{cfg.BotMessages},
 	}, nil
 }
 
@@ -67,9 +67,9 @@ func (app *App) setupHandlers() {
 
 func (app *App) newHandler() *message.Handler {
 	return &message.Handler{
-		Bot:      app.Bot,
-		OpnRtr:   app.OpnRtr,
-		Messages: app.SystemMessages.Messages,
-		Lgr:      app.Lgr,
+		Bot:         app.Bot,
+		OpnRtr:      app.OpnRtr,
+		BotMessages: app.SystemMessages.BotMessages,
+		Lgr:         app.Lgr,
 	}
 }
