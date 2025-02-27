@@ -23,5 +23,5 @@ const (
 	NoTelegramToken   = "отсутствует TELEGRAM_TOKEN"
 	NoOpenRouterToken = "отсутствует токен OpenRouter"
 	NoUrl             = "отсутствует API_URL"
-	Model             = "отсутствует название Модели"
+	NoModel           = "отсутствует название Модели"
 )

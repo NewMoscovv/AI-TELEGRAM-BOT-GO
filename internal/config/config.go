@@ -75,7 +75,7 @@ func parseEnv(cfg *Config) error {
 
 	model := os.Getenv("MODEL")
 	if model == "" {
-		return errors.New(consts.Model)
+		return errors.New(consts.NoModel)
 	}
 
 	cfg.TelegramToken = telegramToken
