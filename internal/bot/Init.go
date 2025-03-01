@@ -4,6 +4,7 @@ import (
 	"DeepSee_MAI/internal/config"
 	"DeepSee_MAI/internal/handlers/message"
 	"DeepSee_MAI/internal/openrouter"
+	"DeepSee_MAI/pkg/consts"
 	"DeepSee_MAI/pkg/logger"
 	tele "gopkg.in/telebot.v3"
 	"time"
@@ -45,8 +46,10 @@ func InitApp(cfg *config.Config, lgr *logger.Logger) (*App, error) {
 		SystemMessages: SystemMessages{cfg.BotMessages},
 	}
 
+	chatHistory := openrouter.NewChatHistory(consts.MaxFreeDialogLen)
+
 	// подключение к openRouter
-	opnRtr := openrouter.NewClient(cfg.OpnRtrToken, cfg.APIUrl, cfg.Model, cfg.Prompt)
+	opnRtr := openrouter.NewClient(cfg.OpnRtrToken, cfg.APIUrl, cfg.Model, cfg.Prompt, chatHistory)
 
 	return &App{
 		BotConfig: &botConfig,

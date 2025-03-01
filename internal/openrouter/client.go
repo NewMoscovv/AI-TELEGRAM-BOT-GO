@@ -13,14 +13,22 @@ type ClientResponse interface {
 	GetResponse(prompt string) (string, error)
 }
 
-type Message struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
+type Client struct {
+	APIKey      string
+	APIUrl      string
+	Model       string
+	Prompt      string
+	ChatHistory *ChatHistory
 }
 
-type RequestBody struct {
-	Model    string    `json:"model"`
-	Messages []Message `json:"messages"`
+func NewClient(APIKey, APIUrl, Model string, prompt string, history *ChatHistory) *Client {
+	return &Client{
+		APIKey:      APIKey,
+		APIUrl:      APIUrl,
+		Model:       Model,
+		Prompt:      prompt,
+		ChatHistory: history,
+	}
 }
 
 type ResponseBody struct {
@@ -29,34 +37,25 @@ type ResponseBody struct {
 	} `json:"choices"`
 }
 
-type Client struct {
-	APIKey string
-	APIUrl string
-	Model  string
-	Prompt string
-}
+func (c *Client) GetResponse(prompt string, chatID int64) (string, error) {
 
-func NewClient(APIKey, APIUrl, Model string, prompt string) *Client {
-	return &Client{
-		APIKey: APIKey,
-		APIUrl: APIUrl,
-		Model:  Model,
-		Prompt: prompt}
-}
+	c.ChatHistory.AddMessage(chatID, "user", prompt)
 
-func (c *Client) GetResponse(prompt string) (string, error) {
-	requestBody := RequestBody{
-		Model: c.Model,
-		Messages: []Message{
-			{
-				Role:    "system",
-				Content: c.Prompt,
-			},
-			{
-				Role:    "user",
-				Content: prompt,
-			},
+	messages := c.ChatHistory.GetHistory(chatID)
+
+	messages = append([]Message{
+		{
+			Role:    "system",
+			Content: c.Prompt,
 		},
+	}, messages...)
+
+	requestBody := struct {
+		Model    string    `json:"model"`
+		Messages []Message `json:"messages"`
+	}{
+		Model:    c.Model,
+		Messages: messages,
 	}
 
 	body, err := json.Marshal(requestBody)

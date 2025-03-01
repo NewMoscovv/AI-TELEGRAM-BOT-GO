@@ -42,7 +42,7 @@ func (h *Handler) HandleText(c tele.Context) error {
 			h.Lgr.Err.Printf("%s\n%s", consts.TypingAnimationError, err.Error())
 		}
 
-		response, err := h.OpnRtr.GetResponse(c.Text())
+		response, err := h.OpnRtr.GetResponse(c.Text(), c.Sender().ID)
 		if err != nil {
 			h.Lgr.Err.Printf("%s", err.Error())
 			return c.Send(h.BotMessages.Errors.SmthGoneWrong)
