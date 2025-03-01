@@ -10,11 +10,15 @@ import (
 )
 
 type App struct {
+	BotConfig *StructBot
+	OpnRtr    *openrouter.Client
+	Lgr       *logger.Logger
+}
+
+type StructBot struct {
 	Bot            *tele.Bot
-	OpnRtr         *openrouter.Client
-	msgHandler     message.MsgHandler
-	Lgr            *logger.Logger
 	SystemMessages SystemMessages
+	msgHandler     message.MsgHandler
 }
 
 type SystemMessages struct {
@@ -36,40 +40,44 @@ func InitApp(cfg *config.Config, lgr *logger.Logger) (*App, error) {
 		return nil, err
 	}
 
+	botConfig := StructBot{
+		Bot:            bot,
+		SystemMessages: SystemMessages{cfg.BotMessages},
+	}
+
 	// подключение к openRouter
 	opnRtr := openrouter.NewClient(cfg.OpnRtrToken, cfg.APIUrl, cfg.Model, cfg.Prompt)
 
 	return &App{
-		Bot:            bot,
-		OpnRtr:         opnRtr,
-		Lgr:            lgr,
-		SystemMessages: SystemMessages{cfg.BotMessages},
+		BotConfig: &botConfig,
+		OpnRtr:    opnRtr,
+		Lgr:       lgr,
 	}, nil
 }
 
 func (app *App) Start() {
 
-	app.Lgr.Info.Printf("Бот запущен с именем @%s", app.Bot.Me.Username)
+	app.Lgr.Info.Printf("Бот запущен с именем @%s", app.BotConfig.Bot.Me.Username)
 
 	app.setupHandlers()
 
-	app.Bot.Start()
+	app.BotConfig.Bot.Start()
 }
 
 func (app *App) setupHandlers() {
 
-	app.msgHandler = app.newHandler()
+	app.BotConfig.msgHandler = app.newHandler()
 
-	app.Bot.Handle("/start", app.msgHandler.HandleStart)
-	app.Bot.Handle(tele.OnText, app.msgHandler.HandleText)
+	app.BotConfig.Bot.Handle("/start", app.BotConfig.msgHandler.HandleStart)
+	app.BotConfig.Bot.Handle(tele.OnText, app.BotConfig.msgHandler.HandleText)
 
 }
 
 func (app *App) newHandler() *message.Handler {
 	return &message.Handler{
-		Bot:         app.Bot,
+		Bot:         app.BotConfig.Bot,
 		OpnRtr:      app.OpnRtr,
-		BotMessages: app.SystemMessages.BotMessages,
+		BotMessages: app.BotConfig.SystemMessages.BotMessages,
 		Lgr:         app.Lgr,
 	}
 }
